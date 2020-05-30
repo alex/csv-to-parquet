@@ -110,12 +110,6 @@ func run(c *cli.Context) error {
 		return err
 	}
 
-	logrus.WithFields(logrus.Fields{
-		"path":        path,
-		"dict-fields": useDictFields,
-		"csv-headers": headerRow,
-	}).Info("csv-to-parquet.initialize")
-
 	ext := filepath.Ext(path)
 	parquetFileWriter, err := local.NewLocalFileWriter(path[:len(path)-len(ext)] + ".parquet")
 	if err != nil {
@@ -132,6 +126,13 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"path":             path,
+		"dict-fields":      useDictFields,
+		"csv-headers":      headerRow,
+		"compression-type": parquetWriter.CompressionType,
+	}).Info("csv-to-parquet.initialize")
 
 	i := 0
 	for _, row := range rows {
