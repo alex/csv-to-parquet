@@ -71,6 +71,17 @@ func convertToInterfaceSlice(vals []string) []interface{} {
 	return storage
 }
 
+func compressionTypeFromCLI(c *cli.Context) (parquet.CompressionCodec, error) {
+	switch c.String("compression-type") {
+	case "snappy":
+		return parquet.CompressionCodec_SNAPPY, nil
+	case "zstd":
+		return parquet.CompressionCodec_ZSTD, nil
+	default:
+		return parquet.CompressionCodec_UNCOMPRESSED, fmt.Errorf("unknown compression type")
+	}
+}
+
 func run(c *cli.Context) error {
 	path := c.Args().Get(0)
 	explicitDictFields := c.StringSlice("dict-field")
@@ -117,7 +128,10 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	parquetWriter.CompressionType = parquet.CompressionCodec_ZSTD
+	parquetWriter.CompressionType, err = compressionTypeFromCLI(c)
+	if err != nil {
+		return err
+	}
 
 	i := 0
 	for _, row := range rows {
@@ -159,6 +173,10 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
 				Name: "dict-field",
+			},
+			&cli.StringFlag{
+				Name:  "compression-type",
+				Value: "snappy",
 			},
 		},
 		Action: run,
