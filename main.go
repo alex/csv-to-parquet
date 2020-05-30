@@ -63,6 +63,16 @@ func estimateUseDictFields(csvReader *csv.Reader, useDictFields []bool) ([][]str
 	return rows, nil
 }
 
+func selectedFields(fields []string, mask []bool) []string {
+	result := []string{}
+	for i, field := range fields {
+		if mask[i] {
+			result = append(result, field)
+		}
+	}
+	return result
+}
+
 func convertToInterfaceSlice(vals []string) []interface{} {
 	storage := make([]interface{}, len(vals))
 	for i, v := range vals {
@@ -133,7 +143,7 @@ func run(c *cli.Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"path":             path,
-		"dict-fields":      useDictFields,
+		"dict-fields":      selectedFields(headerRow, useDictFields),
 		"csv-headers":      headerRow,
 		"compression-type": parquetWriter.CompressionType,
 	}).Info("csv-to-parquet.initialize")
