@@ -100,7 +100,7 @@ func run(c *cli.Context) error {
 	}
 
 	logrus.WithFields(logrus.Fields{
-		"path": path,
+		"path":        path,
 		"dict-fields": useDictFields,
 		"csv-headers": headerRow,
 	}).Info("csv-to-parquet.initialize")
