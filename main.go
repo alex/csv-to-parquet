@@ -110,6 +110,10 @@ func run(c *cli.Context) error {
 		return err
 	}
 
+	// We set this _after_ estimateUseDictFields, because it would be broken
+	// by ReuseRecord.
+	csvReader.ReuseRecord = true
+
 	ext := filepath.Ext(path)
 	parquetFileWriter, err := local.NewLocalFileWriter(path[:len(path)-len(ext)] + ".parquet")
 	if err != nil {
